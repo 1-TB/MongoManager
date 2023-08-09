@@ -44,8 +44,8 @@ class MongoManager
                     {"5", "Settings"},
                     {"6", "Exit"}
                 };
-                AnsiConsole.Render(FormatHeader("Mongo Manager"));
-                AnsiConsole.Render(FormatMenu(menu));
+                AnsiConsole.Write(FormatHeader("Mongo Manager"));
+                AnsiConsole.Write(FormatMenu(menu));
                 var choice = AnsiConsole.Prompt(
                     new SelectionPrompt<int>()
                         .Title("Choose an option:")
@@ -90,8 +90,8 @@ class MongoManager
             {"3", "Change Collection Name"},
             {"4", "Back"}
         };
-        AnsiConsole.Render(FormatHeader("Settings"));
-        AnsiConsole.Render(FormatMenu(menu));
+        AnsiConsole.Write(FormatHeader("Settings"));
+        AnsiConsole.Write(FormatMenu(menu));
         var choice = AnsiConsole.Prompt(
             new SelectionPrompt<int>()
                 .Title("Choose an option:")
@@ -121,7 +121,7 @@ class MongoManager
     {
         var collection = Database.collection;
         Console.Clear();
-        AnsiConsole.Render(FormatHeader("Create Document"));
+        AnsiConsole.Write(FormatHeader("Create Document"));
 
         var filterJson = GetFilter();
         
@@ -136,7 +136,7 @@ class MongoManager
     {
         var collection = Database.collection;
         Console.Clear();
-        AnsiConsole.Render(FormatHeader("Read Documents"));
+        AnsiConsole.Write(FormatHeader("Read Documents"));
 
         var filterJson = GetFilter();
         
@@ -155,7 +155,7 @@ class MongoManager
         foreach (var document in documents)
         {
            
-            AnsiConsole.Render(FormatFromDocument(document));
+            AnsiConsole.Write(FormatFromDocument(document));
 
             AnsiConsole.WriteLine(); // Add an empty line between documents
         }
@@ -169,7 +169,7 @@ class MongoManager
     {
         var collection = Database.collection;
         Console.Clear();
-        AnsiConsole.Render(FormatHeader("Update Document"));
+        AnsiConsole.Write(FormatHeader("Update Document"));
 
         var filterJson = GetFilter();
 
@@ -184,7 +184,7 @@ class MongoManager
         //they should be shown a menu and allow them to select the key they want to edit
         //this menu should be the keys and values of the document
        
-        AnsiConsole.Render(FormatFromDocument(existingDocument));
+        AnsiConsole.Write(FormatFromDocument(existingDocument));
         var choices = new List<string>();
         foreach (var element in existingDocument.Elements)
         {
@@ -221,7 +221,7 @@ class MongoManager
     {
         var collection = Database.collection;
         Console.Clear();
-        AnsiConsole.Render(FormatHeader("Delete Document"));
+        AnsiConsole.Write(FormatHeader("Delete Document"));
 
         var filterJson = GetFilter();
 

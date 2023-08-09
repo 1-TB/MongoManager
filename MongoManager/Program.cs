@@ -81,7 +81,40 @@ class MongoManager
 
     private static void SettingsMenu()
     {
-        throw new NotImplementedException();
+        //show the settings menu and allow the user to change the settings
+        Console.Clear();
+        var menu = new Dictionary<string, string>()
+        {
+            {"1", "Change Connection String"},
+            {"2", "Change Database Name"},
+            {"3", "Change Collection Name"},
+            {"4", "Back"}
+        };
+        AnsiConsole.Render(FormatHeader("Settings"));
+        AnsiConsole.Render(FormatMenu(menu));
+        var choice = AnsiConsole.Prompt(
+            new SelectionPrompt<int>()
+                .Title("Choose an option:")
+                .PageSize(menu.Count)
+                .AddChoices(Enumerable.Range(1, menu.Count))
+        );
+        switch (choice)
+        {
+            case 1:
+                Settings._connectionString = AnsiConsole.Ask<string>("Connection String: ");
+                Settings.Save();
+                break;
+            case 2:
+                Settings._databaseName = AnsiConsole.Ask<string>("Database Name: ");
+                Settings.Save();
+                break;
+            case 3:
+                Settings._collectionName = AnsiConsole.Ask<string>("Collection Name: ");
+                Settings.Save();
+                break;
+            case 4:
+                break;
+        }
     }
 
     static void CreateDocument()
@@ -90,11 +123,10 @@ class MongoManager
         Console.Clear();
         AnsiConsole.Render(FormatHeader("Create Document"));
 
-        var json = AnsiConsole.Prompt(
-            new TextPrompt<string>("Enter the document data (in JSON format):")
-        );
+        var filterJson = GetFilter();
+        
 
-        var document = BsonDocument.Parse(json);
+        var document = BsonDocument.Parse(filterJson);
         collection.InsertOne(document);
 
         AnsiConsole.MarkupLine("[green]Document created successfully.[/]");
@@ -106,9 +138,8 @@ class MongoManager
         Console.Clear();
         AnsiConsole.Render(FormatHeader("Read Documents"));
 
-        var filterJson = AnsiConsole.Prompt(
-            new TextPrompt<string>("Enter a filter for the documents (in JSON format):")
-        );
+        var filterJson = GetFilter();
+        
 
         var filter = BsonDocument.Parse(filterJson);
         var documents = collection.Find(filter).ToList();
@@ -131,12 +162,7 @@ class MongoManager
 
         Console.ReadKey();
     }
-
-
-    static string EscapeValue(string value)
-    {
-        return value.Replace("<", "&lt;").Replace(">", "&gt;");
-    }
+    
 
 
     static void UpdateDocument()
@@ -145,9 +171,7 @@ class MongoManager
         Console.Clear();
         AnsiConsole.Render(FormatHeader("Update Document"));
 
-        var filterJson = AnsiConsole.Prompt(
-            new TextPrompt<string>("Enter a filter for the document to update (in JSON format):")
-        );
+        var filterJson = GetFilter();
 
         var filter = BsonDocument.Parse(filterJson);
         var existingDocument = collection.Find(filter).FirstOrDefault();
@@ -159,7 +183,7 @@ class MongoManager
         }
         //they should be shown a menu and allow them to select the key they want to edit
         //this menu should be the keys and values of the document
-       6
+       
         AnsiConsole.Render(FormatFromDocument(existingDocument));
         var choices = new List<string>();
         foreach (var element in existingDocument.Elements)
@@ -199,9 +223,7 @@ class MongoManager
         Console.Clear();
         AnsiConsole.Render(FormatHeader("Delete Document"));
 
-        var filterJson = AnsiConsole.Prompt(
-            new TextPrompt<string>("Enter a filter for the document to delete (in JSON format):")
-        );
+        var filterJson = GetFilter();
 
         var filter = BsonDocument.Parse(filterJson);
         var result = collection.DeleteOne(filter);
@@ -271,6 +293,32 @@ class MongoManager
       
         string cleanedString = input.Replace("[", "").Replace("]", "");
         return cleanedString;
+    }
+    static string GetFilter()
+    {
+        var filterJson = AnsiConsole.Prompt(
+            new TextPrompt<string>("Enter a filter for the documents (in JSON format):")
+        );
+
+        if (!ValidJson(filterJson))
+        {
+            AnsiConsole.MarkupLine("[red]Invalid JSON.[/]");
+            return null;
+        }
+
+        return filterJson;
+    }
+    static bool ValidJson(string json)
+    {
+        try
+        {
+            BsonDocument.Parse(json);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
    
 }

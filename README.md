@@ -30,7 +30,7 @@ Mongo Manager is a console application written in C# that allows you to interact
 
 ## Screenshots
 
-![Application Screenshot](https://i.imgur.com/jYbyhQd.png)
+![Application Screenshot](https://i.imgur.com/lANye1p.png)
 
 ## Contributing
 

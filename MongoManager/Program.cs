@@ -34,25 +34,28 @@ class MongoManager
             while (true)
             {
                 Console.Clear();
-                var menu = new Dictionary<string, string>()
+              
+                var menu = new List<string>
                 {
-                    {"1", "Create document"},
-                    {"2", "Read document"},
-                    {"3","Show all documents"},
-                    {"4", "Update document"},
-                    {"5", "Delete document"},
-                    {"6", "Settings"},
-                    {"7", "Exit"}
+                    "Create document",
+                    "Read document",
+                    "Show all documents",
+                    "Update document",
+                    "Delete document",
+                    "Settings",
+                    "Exit"
+                    // Add more menu options as needed
                 };
                 AnsiConsole.Write(FormatHeader("Mongo Manager"));
-                AnsiConsole.Write(FormatMenu(menu));
                 var choice = AnsiConsole.Prompt(
-                    new SelectionPrompt<int>()
+                    new SelectionPrompt<string>()
                         .Title("Choose an option:")
                         .PageSize(menu.Count)
-                        .AddChoices(Enumerable.Range(1, menu.Count))
+                        .AddChoices(menu)
                 );
-                switch (choice)
+                var choiceInt = menu.IndexOf(choice) + 1;
+               
+                switch (choiceInt)
                 {
                     case 1:
                         CreateDocument();
@@ -117,23 +120,24 @@ class MongoManager
     {
         //show the settings menu and allow the user to change the settings
         Console.Clear();
-        var menu = new Dictionary<string, string>()
+        
+        var menu = new List<string>
         {
-            {"1", "Change Connection String"},
-            {"2", "Change Database Name"},
-            {"3", "Change Collection Name"},
-            {"4", "Show Values"},
-            {"5", "Back"}
+            "Change Connection String",
+            "Change Database Name",
+            "Change Collection Name",
+            "Show Values",
+            "Back"
         };
         AnsiConsole.Write(FormatHeader("Settings"));
-        AnsiConsole.Write(FormatMenu(menu));
         var choice = AnsiConsole.Prompt(
-            new SelectionPrompt<int>()
+            new SelectionPrompt<string>()
                 .Title("Choose an option:")
                 .PageSize(menu.Count)
-                .AddChoices(Enumerable.Range(1, menu.Count))
+                .AddChoices(menu)
         );
-        switch (choice)
+        var choiceInt = menu.IndexOf(choice) + 1;
+        switch (choiceInt)
         {
             case 1:
                 Settings._connectionString = AnsiConsole.Ask<string>("Connection String: ");

@@ -15,6 +15,7 @@ Mongo Manager is a console application written in C# that allows you to interact
 3. Main menu options:
    - **Create document**: Insert a new document into the specified collection.
    - **Read document**: Retrieve and display documents based on a JSON filter.
+   - **Show all documents**: Retrieve and display all documents.
    - **Update document**: Edit the values of an existing document's fields.
    - **Delete document**: Remove documents based on a JSON filter.
    - **Settings**: Modify the connection settings.

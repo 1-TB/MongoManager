@@ -2,9 +2,9 @@
 
 public static class Settings
 {
-    public static string _connectionString;
-    public static string _databaseName;
-    public static string _collectionName;
+    public static string _connectionString ="";
+    public static string _databaseName = "";
+    public static string _collectionName = "";
     public static string _savePath = "MongoManager.sav";
     
     public static void Save()

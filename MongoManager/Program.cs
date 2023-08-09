@@ -15,6 +15,7 @@ class MongoManager
 
     static void Main(string[] args)
     {
+        
         if (!File.Exists(Settings._savePath))
         {
             // theres no settings file, so we need to create one
@@ -29,8 +30,6 @@ class MongoManager
         }
             AnsiConsole.MarkupLine("[bold red]Settings file found, loading settings...[/]");
             Settings.Load();
-            //setup the database connections
-            Database.Setup(); 
             //start the main loop
             while (true)
             {
@@ -39,10 +38,11 @@ class MongoManager
                 {
                     {"1", "Create document"},
                     {"2", "Read document"},
-                    {"3", "Update document"},
-                    {"4", "Delete document"},
-                    {"5", "Settings"},
-                    {"6", "Exit"}
+                    {"3","Show all documents"},
+                    {"4", "Update document"},
+                    {"5", "Delete document"},
+                    {"6", "Settings"},
+                    {"7", "Exit"}
                 };
                 AnsiConsole.Write(FormatHeader("Mongo Manager"));
                 AnsiConsole.Write(FormatMenu(menu));
@@ -61,15 +61,18 @@ class MongoManager
                         ReadDocuments();
                         break;
                     case 3:
-                        UpdateDocument();
+                        ShowAllDocuments();
                         break;
                     case 4:
-                        DeleteDocument();
+                        UpdateDocument();
                         break;
                     case 5:
-                        SettingsMenu();
+                        DeleteDocument();
                         break;
                     case 6:
+                        SettingsMenu();
+                        break;
+                    case 7:
                         Environment.Exit(0);
                         break;
                     
@@ -77,6 +80,37 @@ class MongoManager
             }
 
 
+    }
+
+    private static void ShowAllDocuments()
+    {
+        //show all documents in the collection
+        Console.Clear();
+        var collection = Database.Collection;
+        var count = collection.CountDocuments(new BsonDocument());
+        if (count == 0)
+        {
+            AnsiConsole.MarkupLine("[bold red]No documents found.[/]");
+            Console.ReadKey();
+            return;
+        }
+
+        if (count > 50)
+        {
+            AnsiConsole.MarkupLine($"[bold red]There are {count} documents in the collection, are you sure you want to show them all?[/]");
+            var confirm = AnsiConsole.Confirm("Show all documents?");
+            if (!confirm)
+            {
+                return;
+            }
+        }
+        var documents = collection.Find(new BsonDocument()).ToList();
+        
+        foreach (var document in documents)
+        {
+            AnsiConsole.Write(FormatFromDocument(document));
+        }
+        Console.ReadKey();
     }
 
     private static void SettingsMenu()
@@ -88,7 +122,8 @@ class MongoManager
             {"1", "Change Connection String"},
             {"2", "Change Database Name"},
             {"3", "Change Collection Name"},
-            {"4", "Back"}
+            {"4", "Show Values"},
+            {"5", "Back"}
         };
         AnsiConsole.Write(FormatHeader("Settings"));
         AnsiConsole.Write(FormatMenu(menu));
@@ -113,13 +148,19 @@ class MongoManager
                 Settings.Save();
                 break;
             case 4:
+                AnsiConsole.MarkupLine($"[yellow]Connection String: {Settings._connectionString}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Database Name: {Settings._databaseName}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Collection Name: {Settings._collectionName}[/]");
+                Console.ReadKey();
+                break;
+            case 5:
                 break;
         }
     }
 
     static void CreateDocument()
     {
-        var collection = Database.collection;
+        var collection = Database.Collection;
         Console.Clear();
         AnsiConsole.Write(FormatHeader("Create Document"));
 
@@ -134,7 +175,7 @@ class MongoManager
 
     static void ReadDocuments()
     {
-        var collection = Database.collection;
+        var collection = Database.Collection;
         Console.Clear();
         AnsiConsole.Write(FormatHeader("Read Documents"));
 
@@ -167,7 +208,7 @@ class MongoManager
 
     static void UpdateDocument()
     {
-        var collection = Database.collection;
+        var collection = Database.Collection;
         Console.Clear();
         AnsiConsole.Write(FormatHeader("Update Document"));
 
@@ -219,7 +260,7 @@ class MongoManager
 
     static void DeleteDocument()
     {
-        var collection = Database.collection;
+        var collection = Database.Collection;
         Console.Clear();
         AnsiConsole.Write(FormatHeader("Delete Document"));
 
@@ -303,7 +344,7 @@ class MongoManager
         if (!ValidJson(filterJson))
         {
             AnsiConsole.MarkupLine("[red]Invalid JSON.[/]");
-            return null;
+            filterJson = GetFilter();
         }
 
         return filterJson;
